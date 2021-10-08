@@ -1,0 +1,178 @@
+\documentclass[aspectratio=169]{beamer}
+
+\usepackage[english]{babel}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{marvosym}
+\usepackage{minted}
+    \setminted{autogobble}
+    \setminted{escapeinside=@@}
+    \setminted{mathescape}
+\usepackage{multicol,multirow}
+\usepackage{svg}
+\usepackage{setspace_beamer}
+\usepackage{tikz}
+    \usetikzlibrary{patterns}
+\usepackage[normalem]{ulem}
+    \newcommand\csout[1]{\bgroup\markoverwith{\textcolor{#1}{\rule[0.5ex]{4pt}{0.8px}}}\ULon}
+
+\usepackage{csquotes}
+\usepackage[backend=biber,
+            bibstyle=numeric,
+            citestyle=authortitle-icomp,
+            refsection=none,
+            url=true]{biblatex}
+    % Restore Beamer bibitem icons instead of BiBLaTeX [1], [2], etc.
+    \setbeamertemplate{bibliography item}{%
+      \ifboolexpr{ test {\ifentrytype{book}} or test {\ifentrytype{mvbook}}
+        or test {\ifentrytype{collection}} or test {\ifentrytype{mvcollection}}
+        or test {\ifentrytype{reference}} or test {\ifentrytype{mvreference}} }
+        {\setbeamertemplate{bibliography item}[book]}
+        {\ifentrytype{online}
+           {\ifkeyword{gitrepo}
+            {\setbeamertemplate{bibliography item}{\includegraphics[width=1.3em,keepaspectratio]{gfx/gitlogo.eps}}}
+            {\setbeamertemplate{bibliography item}[online]}}
+           {\setbeamertemplate{bibliography item}[article]}}%
+      \usebeamertemplate{bibliography item}}
+
+    \defbibenvironment{bibliography}
+      {\list{}
+         {\settowidth{\labelwidth}{\usebeamertemplate{bibliography item}}%
+          \setlength{\leftmargin}{\labelwidth}%
+          \setlength{\labelsep}{\biblabelsep}%
+          \addtolength{\leftmargin}{\labelsep}%
+          \setlength{\itemsep}{\bibitemsep}%
+          \setlength{\parsep}{\bibparsep}}}
+      {\endlist}
+      {\item}
+    \addbibresource{bibliography.bib}
+
+\usetheme{focus}
+
+% Show \subsubsections in the ToC and the generated PDF document outline too!
+\hypersetup{bookmarksopen=true,bookmarksopenlevel=4}
+\setcounter{tocdepth}{4}
+
+% Decrease the number of the current slide so it falls on the same "logical"
+% number. Simulates 'allowframebreaks' when not possible (e.g. with \minted).
+\newcommand{\decrnumber}{%
+  \only<1>{%
+    \addtocounter{framenumber}{-1} % Use same count as previous slide.
+  }%
+}
+
+% Show image wholly on slide with no respect to where the alignment should be.
+% (via http://tex.stackexchange.com/a/3927)
+\newcommand{\fullslideimage}[1]{%
+\begin{tikzpicture}[remember picture, overlay]
+    \node[at=(current page.center)]{%
+        \includegraphics[keepaspectratio,
+                         width=\paperwidth,
+                         height=\paperheight]{#1}
+    };
+\end{tikzpicture}
+}
+\newcommand{\fullslidecustomimage}[2]{%
+\begin{tikzpicture}[remember picture, overlay]
+    \node[at=(current page.center)]{%
+        \includegraphics[keepaspectratio,
+                         width=\paperwidth,
+                         height=\paperheight,
+                         #2]{#1}
+    };
+\end{tikzpicture}
+}
+
+% Blank (unnumbered) footnote
+\newcommand\blfootnote[1]{%
+    \begingroup
+    \renewcommand\thefootnote{}\footnote{#1}%
+    \addtocounter{footnote}{-1}%
+    \endgroup
+}
+
+% Puts an icon, and a text in a set colour into nicely into an
+% itemize/enumerate.
+\newcommand\icon[3]{%
+    $\vcenter{\hbox{\includegraphics[height=1.5em]{gfx/#1}}}$ \textbf{\emph{\color{#2} #3}}%
+}
+\newcommand\icononly[1]{%
+    $\vcenter{\hbox{\includegraphics[height=1.5em]{gfx/#1}}}$%
+}
+
+\definecolor{purple}{HTML}{7b68ee}
+\definecolor{exampleblue}{HTML}{7289DA}
+
+% C++.
+\def\CC{{C\nolinebreak[4]\hspace{-.07em}\raisebox{.1ex}{\small\bf ++}}}
+
+
+% -----------------------------------------------------------------------------
+\title{Title?}
+\subtitle{Subtitle}
+\author{\texorpdfstring{\uline{Presenter}}{Presenter}}
+% \titlegraphic{%
+%     \includegraphics[width=5cm]{gfx/logo.png}
+% }
+\institute{\normalsize Affiliation}
+\date{2099.99.99.}
+
+\begin{document}
+
+% Don't show a "Section" slide for any introduction slides. Instead, show a ToC
+% for the current section highlighted.
+\AtBeginSection[]{
+  \begin{frame}[plain,noframenumbering]{}
+    \tableofcontents[
+      % Show the current 1st level section filled, and grey out the rest.
+      sectionstyle=show/shaded,
+      % Show the current subsection (which might be not existing), and the rest
+      % of the section, hide 2nd levels of other sections.
+      subsectionstyle=show/show/hide,
+      % Show 3rd level subsubsections of the current subsection (which might
+      % not exist), grey the other children of the current 2nd level subsection
+      % (once again, usually empty), and show the rest of the current section,
+      % but hide children of other 1st levels.
+      subsubsectionstyle=show/show/show/hide]
+  \end{frame}%
+}
+
+% Don't show a "Subsection" heading slide either, instead show a ToC for the
+% current subsection.
+\AtBeginSubsection[]{
+  \begin{frame}[plain,noframenumbering]{}
+    \tableofcontents[
+      % Show the current 1st level section filled, and grey out the rest.
+      sectionstyle=show/shaded,
+      % Show the current subsection, grey out the rest of the section,
+      % hide 2nd levels of other sections.
+      subsectionstyle=show/shaded/hide,
+      % Show 3rd level subsubsections of the current subsection, grey the other
+      % children of the current 2nd level subsection, and hide children of
+      % other 1st levels.
+      subsubsectionstyle=show/show/shaded/hide]
+  \end{frame}%
+}
+
+\begin{frame}
+  \maketitle
+\end{frame}
+
+\begin{frame}%[noframenumbering]
+  \tableofcontents[subsubsectionstyle=hide]
+\end{frame}
+
+\section{Foo}
+
+% Use a smaller font here so that every reference fits on a slide.
+% \AtNextBibliography{\small}
+% \begin{frame}[noframenumbering, t,
+%     allowframebreaks
+%     ]{References}
+%     %\nocite{*}
+%     \printbibliography
+% \end{frame}
+
+\end{document}
