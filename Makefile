@@ -1,20 +1,30 @@
+#!/usr/bin/make -f
+
+# Set the projects (top-level .tex files) you want to compile.
 PROJECTS ?= presentation
 
-VIEWER ?= evince
-LATEXMK=latexmk
-ENGINE=pdflatex
-ENGINE_OPTIONS=-shell-escape -synctex=1
+# The main project (where the metadata is loaded from).
+MAIN ?= presentation
 
+# The presentation project.
+PRESENTATION ?= presentation
+
+# The resulting combined file.
+COMBINED ?= combined
+
+VIEWER         ?= evince
+ENGINE         ?= pdflatex
+LATEXMK        ?= latexmk
+ENGINE_OPTIONS ?= -shell-escape -synctex=1
+
+# FIXME: Maybe a better way to detect dependencies somehow? TeX LSP? :'D
 SOURCES=$(wildcard ./*.tex ./*.bib)
 
 # paper.pdf presentation.pdf ...
 OUTPUTS := $(foreach proj, $(PROJECTS), $(proj).pdf)
 
-MAIN ?= presentation.pdf
-PRESENTATION ?= presentation.pdf
-
 default: all
-all: $(PRESENTATION)
+all: $(MAIN).pdf
 
 .PHONY: $(PROJECTS)
 $(PROJECTS): %:
@@ -46,9 +56,27 @@ GRAYS := $(foreach proj, $(PROJECTS), $(proj)-gray.pdf)
 show-gray: $(GRAYS)
 	$(VIEWER) $(GRAYS) &>/dev/null &
 
+# (Needed: pip install 'lpython pdfrw stapler')
+$(COMBINED).pdf: $(OUTPUTS)
+	stapler --force cat $^ $@
+	# Rewrite the metadata in the combined file with the one in the main
+	# project. Sadly, 'stapler' by default clears the metadata portion.
+	lpython -t bare \
+		"from pdfrw import PdfReader, PdfWriter;; "\
+		"presData = PdfReader(ARGS[1]); "\
+		"outf = PdfReader(ARGS[2]); "\
+		"outf.Info = presData.Info; "\
+		"PdfWriter(ARGS[2], trailer=outf).write()" \
+		-X $(MAIN).pdf \
+		-X $@
+
+.PHONY: show-combined
+show-combined: combined.pdf
+	$(VIEWER) $^ &>/dev/null &
+
 .PHONY: present
-present: $(PRESENTATION)
-	pdfpc $(PRESENTATION)
+present: $(PRESENTATION).pdf
+	pdfpc $(PRESENTATION).pdf
 
 .PHONY: clean
 clean: --clean-extra
@@ -59,9 +87,15 @@ distclean: clean
 	$(LATEXMK) -$(ENGINE) -C
 	$(RM) $(GRAYS)
 	$(RM) $(TEXTS)
-	$(RM) $(PRESENTATION)
+	$(RM) $(COMBINED).pdf
 
 .PHONY: --clean-extra
 --clean-extra:
-	$(RM) $(wildcard ./*.cut) $(wildcard ./*.bbl) $(wildcard ./*.nav) $(wildcard ./*.snm) $(wildcard ./*.vrb) $(wildcard ./*.synctex.gz) $(wildcard ./*.run.xml)
-	$(RM) -r $(wildcard ./_minted-*) "./svg-inkscape"
+	$(RM) $(wildcard ./*.cut) \
+		$(wildcard ./*.bbl) \
+		$(wildcard ./*.nav) \
+		$(wildcard ./*.snm) \
+		$(wildcard ./*.vrb) \
+		$(wildcard ./*.synctex.gz) \
+		$(wildcard ./*.run.xml)
+	$(RM) -r $(wildcard ./_minted-*)
