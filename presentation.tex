@@ -18,6 +18,9 @@
 \usepackage[normalem]{ulem}
     \newcommand\csout[1]{\bgroup\markoverwith{\textcolor{#1}{\rule[0.5ex]{4pt}{0.8px}}}\ULon}
 
+\usepackage{blfootnote}
+\usepackage{cppligature}
+
 \usepackage{csquotes}
 \usepackage[backend=biber,
             bibstyle=numeric,
@@ -83,14 +86,6 @@
                          #2]{#1}
     };
 \end{tikzpicture}
-}
-
-% Blank (unnumbered) footnote
-\newcommand\blfootnote[1]{%
-    \begingroup
-    \renewcommand\thefootnote{}\footnote{#1}%
-    \addtocounter{footnote}{-1}%
-    \endgroup
 }
 
 % Puts an icon, and a text in a set colour into nicely into an
