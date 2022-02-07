@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 
 # Set the projects (top-level .tex files) you want to compile.
-PROJECTS ?= presentation
+PROJECTS ?= presentation poster
 
 # The main project (where the metadata is loaded from).
 MAIN ?= presentation
