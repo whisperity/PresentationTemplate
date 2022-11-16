@@ -22,6 +22,15 @@
 \usepackage{cppligature}
   \def\CC{\CCBeamer{}}
 
+\usepackage{unicode-math}
+    % These glyphs are missing from Fira Code used by the theme.
+    \setmathfont{XITSMath-Regular}
+    [
+        range={\vdots,\ddots},
+        Extension = .otf,
+        BoldFont = XITSMath-Bold,
+    ]
+
 \usepackage{csquotes}
 \usepackage[backend=biber,
             bibstyle=numeric,
