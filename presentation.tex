@@ -117,6 +117,27 @@
 \definecolor{purple}{HTML}{7b68ee}
 \definecolor{exampleblue}{HTML}{7289DA}
 
+% Allow specifying a block with any colour settings.
+\newenvironment{coloredblock}[3]{% How the block begins...
+        \setbeamercolor{block body}{#2}
+        \setbeamercolor{block title}{#3}
+        \begin{block}{#1}
+    }{ % How the block ends...
+        \end{block}
+    }
+
+% Uses the new blue colour. (Styling taken from Focus theme's code.)
+\newenvironment{blueblock}[1]{%
+    \begin{coloredblock}{#1}{bg=exampleblue!10!background, fg=main}{bg=exampleblue, fg=background}
+}{\end{coloredblock}}
+
+% Reset \block colours to normal after a \coloredblock.
+\AfterEndEnvironment{coloredblock}{
+    % These are directly taken from the theme file!
+    \setbeamercolor{block title}{bg=main!80!background, fg=background}
+    \setbeamercolor{block body}{bg=main!10!background, fg=main}
+}
+
 
 
 % -----------------------------------------------------------------------------
